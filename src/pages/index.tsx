@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import Head from "next/head";
 import Top1 from "@/Components/top1";
 import { useId, useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 interface thingprops {
   text: string;
   amount: number;
   type: "expense" | "income";
-  id: number;
+  id: string;
 }
 export default function Home() {
   const [allmain, setAllmain] = useState<Array<thingprops>>([]);
@@ -13,14 +16,13 @@ export default function Home() {
     text: "",
     amount: 0,
     type: "expense",
-    id: 0,
+    id: '',
   });
 
   const HandleClick = () => {
-    const uid = useId();
-    setMain((prev) => ({ ...prev, id: parseInt(uid) }));
+    setMain((prev) => ({ ...prev, id: uuidv4() }));
     setAllmain((prevmain) => [...prevmain, main]);
-    setMain({ text: "", amount: 0, type: "expense", id: 0 });
+    setMain({ text: "", amount: 0, type: "expense", id: '' });
   };
   return (
     <>
