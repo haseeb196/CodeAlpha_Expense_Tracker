@@ -12,6 +12,7 @@ interface thingprops {
   type: "expense" | "income";
   id: string;
 }
+
 export default function Home() {
   const [allmain, setAllmain] = useState<Array<thingprops>>([]);
   const [edit, setEdit] = useState<boolean>(false);
@@ -47,10 +48,10 @@ export default function Home() {
   }, [allmain]);
 
   const HandleClick = () => {
-    // Update id
-    const updatedMain = { ...main, id: uuidv4() };
+    
 
-    if (updatedMain.amount !== 0 || updatedMain.text !== "") {
+    if (main.amount > 0 && main.text !== "") {
+      const updatedMain = { ...main, id: uuidv4() };
       setAllmain((prevmain) => [updatedMain, ...prevmain]);
     }
 
@@ -65,6 +66,22 @@ export default function Home() {
 
     setEdit(true);
     setEditmain(data);
+  };
+  const HandleEdited = (id: string) => {
+    const ntbe = allmain.find((x) => x.id === id);
+    const allother = allmain.filter((x) => x.id !== id);
+    console.log(editmain);
+    const edited = {
+      ...ntbe,
+      text: editmain?.text ?? "",
+      amount: editmain?.amount ?? 0,
+      type: editmain?.type ?? "expense",
+      id: editmain?.id ?? "",
+    };
+
+    setAllmain([edited, ...allother]);
+    setEdit(false);
+    setEditmain({ text: "", amount: 0, type: "expense", id: "" });gag
   };
 
   return (
@@ -103,7 +120,7 @@ export default function Home() {
                   key={x.id}
                   className={`group relative flex justify-between rounded-sm border-r-[3px] ${x.type === "expense" ? "border-r-red-500" : "border-r-green-500"} bg-white px-2 py-3 shadow-md`}
                 >
-                  {!edit ? (
+                  {x.id !== editmain?.id && !edit ? (
                     <>
                       <p className="capitalize">{x.text}</p>
                       <p>{x.type === "expense" ? -x.amount : x.amount}$</p>
@@ -126,18 +143,30 @@ export default function Home() {
                     <>
                       <input
                         type="text"
-                        className="max-w-[120px]  rounded-sm bg-black  outline-none"
+                        className="h-8 max-w-[120px] rounded-sm bg-[#f5f3f3]  pl-1 outline-none"
                         placeholder="text"
-                        value={editmain?.text}
+                        defaultValue={editmain?.text}
+                        onChange={(e) =>
+                          setEditmain((prev) => ({
+                            ...prev!,
+                            text: e.target.value,
+                          }))
+                        }
                       />
                       <input
                         type="number"
-                        className="max-w-[70px] bg-black rounded-sm  outline-none"
+                        className="h-8 max-w-[70px] rounded-sm bg-[#f5f3f3] pl-1  outline-none"
                         placeholder="0"
-                        value={editmain?.amount}
+                        defaultValue={editmain?.amount}
+                        onChange={(e) =>
+                          setEditmain((prev) => ({
+                            ...prev!,
+                            amount: parseInt(e.target.value),
+                          }))
+                        }
                       />
-                      <IconButton>
-                        <Check />
+                      <IconButton onClick={() => HandleEdited(x.id)}>
+                        <Check fontSize="small" />
                       </IconButton>
                     </>
                   )}
