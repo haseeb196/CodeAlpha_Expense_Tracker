@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+import { Delete, Edit } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 import Head from "next/head";
-import Top1 from "@/Components/top1";
-import { useId, useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 interface thingprops {
   text: string;
   amount: number;
@@ -12,18 +13,42 @@ interface thingprops {
 }
 export default function Home() {
   const [allmain, setAllmain] = useState<Array<thingprops>>([]);
+  const [totalexpense, setTotalexpense] = useState(0);
+  const [totalincome, setTotalincome] = useState(0);
   const [main, setMain] = useState<thingprops>({
     text: "",
     amount: 0,
     type: "expense",
-    id: '',
+    id: "",
   });
-
+  useEffect(() => {
+    setTotalexpense(
+      allmain
+        .filter((x) => x.type === "expense")
+        .reduce((prev, current) => current.amount + prev, 0),
+    );
+    setTotalincome(
+      allmain.reduce(
+        (prev, current) =>
+          current.type === "income"
+            ? prev + current.amount
+            : prev - current.amount,
+        0,
+      ),
+    );
+  }, [allmain]);
   const HandleClick = () => {
     setMain((prev) => ({ ...prev, id: uuidv4() }));
-    setAllmain((prevmain) => [...prevmain, main]);
-    setMain({ text: "", amount: 0, type: "expense", id: '' });
+    console.log(main);
+    if (main.amount !== 0 || main.text !== "") {
+      setAllmain((prevmain) => [...prevmain, main]);
+    }
+    setMain({ text: "", amount: 0, type: "expense", id: "" });
   };
+  const HandleDelete = (id: string) => {
+    setAllmain(allmain.filter((x) => x.id !== id));
+  };
+
   return (
     <>
       <Head>
@@ -34,15 +59,47 @@ export default function Home() {
       <main className="flex h-screen items-center justify-center font-bold">
         <div className="space-y-4 rounded-lg bg-[#f5f3f3] px-24  py-5 shadow-sm">
           <h2 className="text-[20px]">Expense Tracker</h2>
-          <Top1 />
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg uppercase">your balance</h3>
+              <h3 className="text-xl">{totalincome}$</h3>
+            </div>
+            <div className="flex space-x-7 bg-white px-8 py-4 text-lg shadow-md">
+              <div className="text-center">
+                <h3 className="uppercase">income</h3>
+                <p>${totalincome}</p>
+              </div>
+              <div className="w-[1.5px] bg-black"></div>
+              <div className="text-center">
+                <h3 className="uppercase">expense</h3>
+                <p>${totalexpense}</p>
+              </div>
+            </div>
+          </div>
           <div>
             <h3 className="pb-2 text-xl">History</h3>
             <div className="h-[2px] bg-black" />
             <div className="space-y-2 py-2">
-              <div className="flex justify-between rounded-sm border-r-[3px] border-r-red-500 bg-white px-2 py-3 shadow-md">
-                <p className="capitalize">flower</p>
-                <p>-20$</p>
-              </div>
+              {allmain.map((x) => (
+                <div
+                  key={x.id}
+                  className={`group relative flex justify-between rounded-sm border-r-[3px] ${x.type === "expense" ? "border-r-red-500" : "border-r-green-500"} bg-white px-2 py-3 shadow-md`}
+                >
+                  <p className="capitalize">{x.text}</p>
+                  <p>{x.type === "expense" ? -x.amount : x.amount}$</p>
+                  <div className="absolute right-2 top-2  hidden space-x-2 group-hover:block">
+                    <IconButton
+                      className="!rounded-lg !bg-gray-200"
+                      onClick={() => HandleDelete(x.id)}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                    <IconButton className="!rounded-lg !bg-gray-200">
+                      <Edit fontSize="small" />
+                    </IconButton>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           <div className="space-y-3">
