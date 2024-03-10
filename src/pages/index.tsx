@@ -15,7 +15,6 @@ interface thingprops {
 
 export default function Home() {
   const [allmain, setAllmain] = useState<Array<thingprops>>([]);
-  const [edit, setEdit] = useState<boolean>(false);
   const [editmain, setEditmain] = useState<thingprops | undefined>({
     text: "",
     amount: 0,
@@ -48,14 +47,11 @@ export default function Home() {
   }, [allmain]);
 
   const HandleClick = () => {
-    
-
     if (main.amount > 0 && main.text !== "") {
       const updatedMain = { ...main, id: uuidv4() };
       setAllmain((prevmain) => [updatedMain, ...prevmain]);
+      setMain({ text: "", amount: 0, type: "expense", id: "" });
     }
-
-    setMain({ text: "", amount: 0, type: "expense", id: "" });
   };
 
   const HandleDelete = (id: string) => {
@@ -63,14 +59,12 @@ export default function Home() {
   };
   const HandleEdit = (id: string) => {
     const data = allmain.find((x) => x.id === id);
-
-    setEdit(true);
     setEditmain(data);
   };
   const HandleEdited = (id: string) => {
     const ntbe = allmain.find((x) => x.id === id);
     const allother = allmain.filter((x) => x.id !== id);
-    console.log(editmain);
+
     const edited = {
       ...ntbe,
       text: editmain?.text ?? "",
@@ -78,10 +72,11 @@ export default function Home() {
       type: editmain?.type ?? "expense",
       id: editmain?.id ?? "",
     };
+    if (ntbe !== edited) {
+      setAllmain([edited, ...allother]);
+    }
 
-    setAllmain([edited, ...allother]);
-    setEdit(false);
-    setEditmain({ text: "", amount: 0, type: "expense", id: "" });gag
+    setEditmain({ text: "", amount: 0, type: "expense", id: "" });
   };
 
   return (
@@ -120,7 +115,7 @@ export default function Home() {
                   key={x.id}
                   className={`group relative flex justify-between rounded-sm border-r-[3px] ${x.type === "expense" ? "border-r-red-500" : "border-r-green-500"} bg-white px-2 py-3 shadow-md`}
                 >
-                  {x.id !== editmain?.id && !edit ? (
+                  {x.id !== editmain?.id ? (
                     <>
                       <p className="capitalize">{x.text}</p>
                       <p>{x.type === "expense" ? -x.amount : x.amount}$</p>
@@ -143,7 +138,7 @@ export default function Home() {
                     <>
                       <input
                         type="text"
-                        className="h-8 max-w-[120px] rounded-sm bg-[#f5f3f3]  pl-1 outline-none"
+                        className="h-8 max-w-[150px] rounded-sm bg-[#f5f3f3]  pl-1 outline-none"
                         placeholder="text"
                         defaultValue={editmain?.text}
                         onChange={(e) =>
@@ -155,7 +150,7 @@ export default function Home() {
                       />
                       <input
                         type="number"
-                        className="h-8 max-w-[70px] rounded-sm bg-[#f5f3f3] pl-1  outline-none"
+                        className="h-8 max-w-[100px] rounded-sm bg-[#f5f3f3] pl-1  outline-none"
                         placeholder="0"
                         defaultValue={editmain?.amount}
                         onChange={(e) =>
