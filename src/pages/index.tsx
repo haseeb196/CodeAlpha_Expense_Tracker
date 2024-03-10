@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 import { Check, Delete, Edit } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import Head from "next/head";
@@ -15,6 +15,7 @@ interface thingprops {
 
 export default function Home() {
   const [allmain, setAllmain] = useState<Array<thingprops>>([]);
+
   const [editmain, setEditmain] = useState<thingprops | undefined>({
     text: "",
     amount: 0,
@@ -29,6 +30,17 @@ export default function Home() {
     type: "expense",
     id: "",
   });
+
+  useEffect(() => {
+    const getdata = localStorage.getItem("data");
+
+    if (getdata !== null) {
+      const fjdata = JSON.parse(getdata);
+
+      setAllmain(fjdata);
+    }
+  }, []);
+
   useEffect(() => {
     setTotalexpense(
       allmain
@@ -44,6 +56,7 @@ export default function Home() {
         0,
       ),
     );
+    localStorage.setItem("data", JSON.stringify(allmain));
   }, [allmain]);
 
   const HandleClick = () => {
@@ -57,10 +70,12 @@ export default function Home() {
   const HandleDelete = (id: string) => {
     setAllmain(allmain.filter((x) => x.id !== id));
   };
+
   const HandleEdit = (id: string) => {
     const data = allmain.find((x) => x.id === id);
     setEditmain(data);
   };
+
   const HandleEdited = (id: string) => {
     const ntbe = allmain.find((x) => x.id === id);
     const allother = allmain.filter((x) => x.id !== id);
@@ -138,7 +153,7 @@ export default function Home() {
                     <>
                       <input
                         type="text"
-                        className="h-8 max-w-[150px] rounded-sm bg-[#f5f3f3]  pl-1 outline-none"
+                        className="h-8 max-w-[110px] rounded-sm bg-[#f5f3f3]  pl-1 outline-none"
                         placeholder="text"
                         defaultValue={editmain?.text}
                         onChange={(e) =>
@@ -150,7 +165,7 @@ export default function Home() {
                       />
                       <input
                         type="number"
-                        className="h-8 max-w-[100px] rounded-sm bg-[#f5f3f3] pl-1  outline-none"
+                        className="h-8 max-w-[70px] rounded-sm bg-[#f5f3f3] pl-1  outline-none"
                         placeholder="0"
                         defaultValue={editmain?.amount}
                         onChange={(e) =>
