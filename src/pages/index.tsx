@@ -102,8 +102,8 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex h-screen items-center justify-center bg-gray-800 font-bold">
-        <div className="min-h-[78vh] flex-col  space-y-4 rounded-lg bg-[#f5f3f3] px-20  py-5 shadow-sm">
-          <h2 className="text-[20px]">Expense Tracker</h2>
+        <div className=" flex-col  space-y-4 rounded-lg bg-[#f5f3f3] px-20 pb-9 py-6 shadow-sm">
+          <h2 className="text-[26px]">Expense Tracker</h2>
           <div className="space-y-4">
             <div>
               <h3 className="text-lg uppercase">your balance</h3>
